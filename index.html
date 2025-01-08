@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Losowanie Osoby</title>
+<style>
+  body {
+    font-family: Calibri, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url("https://i.imgur.com/kaDmWaP.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed; /* Aby tło się nie przewijało */
+  }
+
+  body::before { /* Dodajemy pseudo-element ::before do body */
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: -1; /* Umieszczamy go pod spodem */
+  }
+
+  header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 150px; /* Dostosuj wysokość headera */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Wyśrodkuj zdjęcia w pionie */
+    z-index: 20;
+  }
+      .static-images {
+        display: flex;
+        overflow-x: auto; /* Dodaj pasek przewijania, jeśli zdjęcia nie mieszczą się w headerze */
+      }
+      .static-image {
+        width: 125px; /* Ustaw szerokość zdjęcia */
+        height: 125px; /* Ustaw wysokość zdjęcia */
+        margin-right: 5px; /* Odstęp między zdjęciami */
+        border-radius: 50%;
+        flex-shrink: 0; /* Zapobiega zmniejszaniu się elementów */
+        background-size: cover;
+        background-position: center;
+      }
+
+  .main-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin-top: 170px;
+  }
+  .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Wyśrodkowanie w poziomie */
+  border: none;
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 20px;
+  }
+
+  button {
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #e5d2b9;
+    font-family: Calibri, sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px; /* Zwiększone zaokrąglenie */
+    z-index: 10;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4); /* Cień */
+    transition: all 0.1s ease;
+  }
+
+  button:hover{
+    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px) scale(1.03, 1.03);
+  }
+
+  .add-person-form {
+    margin-top: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+  }
+  .add-person-form input, .add-person-form button {
+    margin-bottom: 5px;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 7px;
+    border: none;
+  }
+  .add-person-form button{
+    padding: 15px 30px;
+    font-size: 20px;
+    border-radius: 15px; /* Zwiększone zaokrąglenie */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4); /* Cień */
+    transition: all 0.1s ease; /* Płynne przejście */
+    margin-top: 10px;
+  }
+  .add-person-form button:hover {
+      transform: translateY(-2px) scale(1.03, 1.03); /* Efekt podniesienia */
+      box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.3); /* Zmieniony cień przy najechaniu */
+  }
+  .add-person-form h3{
+    /* Usunięto tło */
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  .checkboxes-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-right: auto;
+    /* Usunięto tło */
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+  .checkboxes-container{
+    margin-top: 13px;
+    margin-bottom: 13px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    width: 250px;
+  }
+
+  .checkboxes-container .checkbox-item{
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7); /* Dodano półprzezroczyste tło */
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  /* Styl dla okrągłych checkboxów */
+  .checkboxes-container input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+
+  .checkboxes-container input[type="checkbox"]:checked {
+    background-image: url("https://i.imgur.com/zvy8Rd2.png");
+    background-size: cover;
+    background-position: center;
+    border: none;
+  }
+  .checkboxes-container label {
+    margin-right: auto; /* Przesuwa label na lewo */
+  }
+  .delete-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-left: 5px; /* Odstęp od labela */
+    vertical-align: middle;
+  }
+
+  /* Styl dla wylosowanego imienia */
+  .result-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+
+  .result-name {
+    font-size: 32px;
+    font-weight: bold;
+    padding: 20px 10px;
+    border-radius: 5px;
+    position: relative;
+    text-align: center;
+  }
+
+  .placeholder, .profile-picture {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  .placeholder {
+    background-image: url('https://i.imgur.com/ZHfGL7Y.png');
+  }
+
+  .profile-picture-frame {
+    position: absolute;
+    top: -55px;
+    left: -65px;
+    width: 313px;
+    height: 310px;
+    background-image: url('https://i.imgur.com/d3ZHgkY.png');
+    background-size: auto;
+    background-position: center;
+    z-index: 10;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .placeholder-item {
+    background-image: url('https://i.imgur.com/ZHfGL7Y.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+  }
+
+</style>
+</head>
+<body>
+<header>
+      <div class="static-images" id="static-images"></div> </header>
+
+    <div class="main-container">
+      <div>
+        <div class="checkboxes-title">Lista obecności:</div>
+        <div class="checkboxes-container" id="checkboxes-container"></div>
+      </div>
+
+<div class="container">
+  <button onclick="drawName()">Losuj</button>
+  <div class="result-container">
+    <div id="profile-picture" class="placeholder"></div>
+    <div id="profile-picture-frame" class="hidden"></div>
+    <div id="result-name" class="result-name hidden"></div>
+  </div>
+</div>
+
+      <div class="add-person-form">
+        <h3>Dodaj nową osobę</h3>
+        <input type="text" id="new-name" placeholder="Imię" />
+
+        <input type="text" id="new-photo-url" placeholder="URL zdjęcia" />
+        <button onclick="addPerson()">Dodaj</button>
+      </div>
+    </div>
+
+<script>
+  // Pobierz zapisane dane z localStorage lub użyj domyślnych
+  let names = JSON.parse(localStorage.getItem('names')) || {
+    "Marcelina": "https://media.licdn.com/dms/image/v2/D4D03AQGd4MEZhK9r3A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1687258028811?e=1741824000&v=beta&t=yV7QR7P0zlxqcdzCDJCi0NFXADWrX4euOIeCp8jke70",
+    "Natalia": "https://media.licdn.com/dms/image/v2/C4D03AQEm559qAqri7A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1667932476334?e=1741824000&v=beta&t=joGaqhLtSifopD8mdV6_hnfBLDje-8YBbZjkl__dr-w",
+    "Julia": "https://media.licdn.com/dms/image/v2/C4E03AQFF984-7ZmpJg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1604905895869?e=1741824000&v=beta&t=n861IqHtSah0JrUe5kzXkQuUKGgRLdR09GQY1U72BwA",
+    "Dawid": "https://media.licdn.com/dms/image/v2/D4D03AQE2rgvtWF5yNQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1714566886028?e=1741824000&v=beta&t=MuKA3W4d8_VE_nkvcDpBpBiRaAEtlSsbhlwUaOjr87M",
+    "Anna": "https://media.licdn.com/dms/image/v2/C4D03AQG5B3O4LpVFVA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1542792605240?e=1741824000&v=beta&t=1oar1B-VBc2Q1M08p4x_fAZap-eU3cMktLa4SUUtJtg",
+    "Maria": "https://media.licdn.com/dms/image/v2/C4E03AQH9iCLC-r68Xg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1655757587525?e=1741824000&v=beta&t=xvTHfHyPHWlGGt6CQhKk6ClnG0V9HxWiqgkroeadV-4"
+  };
+  let usedNames = [];
+  let carouselInterval;
+
+  function drawName() {
+    const availableNames = Object.keys(names).filter(name => isNameChecked(name));
+
+    if (availableNames.length === 0) {
+      alert("Wszystkie imiona zostały wylosowane!");
+      return;
+    }
+
+    let randomIndex = Math.floor(Math.random() * availableNames.length);
+    let drawnName = availableNames[randomIndex];
+
+    showDrawnPerson(drawnName);
+
+    usedNames.push(drawnName);
+    localStorage.setItem('usedNames', JSON.stringify(usedNames));
+    updateCheckboxes();
+    // Po wylosowaniu imienia, pokaż przycisk "Od nowa"
+  document.getElementById("redrawButton").classList.remove("hidden");
+}
+
+  function showDrawnPerson(drawnName) {
+    const profilePicture = document.getElementById("profile-picture");
+    const profilePictureFrame = document.getElementById("profile-picture-frame");
+    const resultName = document.getElementById("result-name");
+
+    profilePicture.style.backgroundImage = `url('${names[drawnName]}')`;
+    profilePicture.classList.remove("placeholder");
+    profilePicture.classList.add("profile-picture");
+
+    profilePictureFrame.classList.remove("hidden");
+    resultName.textContent = drawnName;
+    resultName.classList.remove("hidden");
+
+    // Ustawienie pozycji imienia pod zdjęciem
+    resultName.style.top = '200px'; // Dostosuj, jeśli trzeba
+    resultName.style.position = 'absolute'
+    resultName.style.width = '100%'
+    profilePicture.style.top = '20px'; // Dostosuj, jeśli trzeba
+    profilePictureFrame.style.top = '-35px'; // Dostosuj, jeśli trzeba
+
+    // Usunięcie obramowania z imienia
+    resultName.style.border = 'none';
+  }
+
+  function addPerson() {
+        const newName = document.getElementById("new-name").value;
+        const newPhotoUrl = document.getElementById("new-photo-url").value;
+        const defaultPhoto = 'https://i.imgur.com/ZHfGL7Y.png';
+
+        if (newName) {
+            names[newName] = newPhotoUrl || defaultPhoto;
+            localStorage.setItem('names', JSON.stringify(names));
+            document.getElementById("new-name").value = "";
+            document.getElementById("new-photo-url").value = "";
+            updateCheckboxes();
+            alert("Dodano nową osobę!");
+        } else {
+            alert("Wprowadź imię!");
+        }
+    }
+
+  function deletePerson(name) {
+    if (confirm(`Czy na pewno chcesz usunąć ${name}?`)) {
+      delete names[name];
+      usedNames = usedNames.filter(item => item !== name);
+      localStorage.setItem('names', JSON.stringify(names));
+      localStorage.setItem('usedNames', JSON.stringify(usedNames));
+      updateCheckboxes();
+    }
+  }
+
+  function updateCheckboxes() {
+        const checkboxesContainer = document.getElementById("checkboxes-container");
+        const staticImages = document.getElementById("static-images"); // Pobierz element static-images
+        checkboxesContainer.innerHTML = "";
+        staticImages.innerHTML = ""; // Wyczyść element static-images
+
+        for (const name in names) {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = name;
+
+      checkbox.checked = !usedNames.includes(name); // Zawsze zaznaczone
+
+      checkbox.addEventListener('change', () => {
+        if (!checkbox.checked) {
+          usedNames.push(name);
+        } else {
+          usedNames = usedNames.filter(item => item !== name);
+        }
+        localStorage.setItem('usedNames', JSON.stringify(usedNames));
+      });
+
+      const label = document.createElement("label");
+      label.htmlFor = name;
+      label.textContent = name;
+
+      const deleteIcon = document.createElement("img");
+      deleteIcon.src = "https://i.imgur.com/AmVyAuc.png";
+      deleteIcon.alt = "Usuń";
+      deleteIcon.classList.add("delete-icon");
+      deleteIcon.addEventListener('click', () => deletePerson(name));
+
+      const container = document.createElement("div");
+      container.classList.add("checkbox-item");
+      container.appendChild(checkbox);
+      container.appendChild(label);
+      container.appendChild(deleteIcon);
+
+      checkboxesContainer.appendChild(container);
+      const img = document.createElement("div");
+          img.style.backgroundImage = `url('${names[name]}')`;
+          img.classList.add("static-image");
+          staticImages.appendChild(img);
+    }
+  }
+
+  function isNameChecked(name) {
+    const checkbox = document.getElementById(name);
+    return checkbox ? checkbox.checked : false;
+  }
+
+  updateCheckboxes();
+</script>
+
+</body>
+</html>
